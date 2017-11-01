@@ -16,7 +16,11 @@ import com.javipacheco.demokotlinakka.services.ApiService
 import com.javipacheco.demokotlinakka.services.MainUiService
 import com.javipacheco.demokotlinakka.ui.main.NavigationItems.*
 import akme.*
+import android.support.v7.widget.LinearLayoutManager
 import com.javipacheco.demokotlinakka.actors.MainErrorActor
+import com.javipacheco.demokotlinakka.models.Events
+import com.javipacheco.demokotlinakka.ui.main.adapters.NewsAdapter
+import kategory.ListKW
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -36,6 +40,9 @@ class MainActivity :
 
         mainActorRef.tell(InitCommand, system.deadLetters())
         mainActorRef.tell(FillMessageCommand, system.deadLetters())
+
+        val layoutManager = LinearLayoutManager(this)
+        recycler.setLayoutManager(layoutManager)
 
     }
 
@@ -81,8 +88,10 @@ class MainActivity :
         nav_view.setNavigationItemSelectedListener(this)
     }
 
-    override fun writeMessage(msg: String): Service<Unit> =
-            runOnUiThread { my_text.setText(msg) }.catchUi()
+    override fun writeMessage(items: ListKW<Events.RedditNewsDataEvent>): Service<Unit> =
+            runOnUiThread {
+                recycler.adapter = NewsAdapter(items)
+            }.catchUi()
 
     override fun showMessage(msg: String): Service<Unit> =
             Snackbar.make(drawer_layout, msg, Snackbar.LENGTH_LONG).show().catchUi()

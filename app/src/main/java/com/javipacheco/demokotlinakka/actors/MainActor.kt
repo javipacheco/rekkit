@@ -27,8 +27,8 @@ class MainActor(val errorActor: ActorRef, val apiService: ApiService, val uiServ
         })
         .match(FillMessageCommand::class.java, { _ ->
             ServiceMonad().binding {
-                val msg = apiService.getNews("", "10").bind()
-                uiService.writeMessage(msg[0].author).bind()
+                val news = apiService.getNews("", "10").bind()
+                uiService.writeMessage(news).bind()
                 yields(Unit)
             }
         })

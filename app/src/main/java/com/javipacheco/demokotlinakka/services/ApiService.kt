@@ -1,7 +1,6 @@
 package com.javipacheco.demokotlinakka.services
 
-import akme.Service
-import akme.toService
+import akme.*
 import kategory.*
 import com.javipacheco.demokotlinakka.api.RedditApi
 import com.javipacheco.demokotlinakka.models.Events
