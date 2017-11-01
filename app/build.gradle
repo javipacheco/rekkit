@@ -39,5 +39,6 @@ dependencies {
 
     compile 'io.kategory:kategory:0.3.10'
 
-    compile 'com.github.jkcclemens:khttp:0.1.0'
+    compile "com.squareup.retrofit2:retrofit:2.0.0"
+    compile "com.squareup.retrofit2:converter-moshi:2.0.0"
 }

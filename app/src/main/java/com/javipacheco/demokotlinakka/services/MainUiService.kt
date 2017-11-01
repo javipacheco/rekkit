@@ -1,7 +1,7 @@
 package com.javipacheco.demokotlinakka.services
 
 import com.javipacheco.demokotlinakka.ui.main.NavigationItems
-import katkka.*
+import akme.*
 
 interface MainUiService {
 

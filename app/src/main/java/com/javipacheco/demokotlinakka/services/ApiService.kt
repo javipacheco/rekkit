@@ -1,19 +1,27 @@
 package com.javipacheco.demokotlinakka.services
 
-import khttp.get
-import katkka.*
+import akme.Service
+import akme.toService
 import kategory.*
+import com.javipacheco.demokotlinakka.api.RedditApi
+import com.javipacheco.demokotlinakka.models.Responses.RedditChildrenResponse
+import retrofit2.Retrofit
+import retrofit2.converter.moshi.MoshiConverterFactory
 
 class ApiService {
 
-    fun getDogs(): Service<ListKW<String>> = ServiceRight {
-        val json = get("https://dog.ceo/api/breeds/list").jsonObject
-        json.getJSONArray("message").toListKW<String>()
+    private val redditApi: RedditApi
+
+    init {
+        val retrofit = Retrofit.Builder()
+                .baseUrl("https://www.reddit.com")
+                .addConverterFactory(MoshiConverterFactory.create())
+                .build()
+
+        redditApi = retrofit.create(RedditApi::class.java)
     }
 
-    fun getRandomImageDog(name: String): Service<String> = ServiceRight {
-        val json = get("""https://dog.ceo/api/breed/$name/images/random""").jsonObject
-        json.getJSONArray("message").toString()
-    }
+    fun getNews(after: String, limit: String): Service<ListKW<RedditChildrenResponse>> =
+            redditApi.getTop(after, limit).toService().map { ListKW(it.data.children) }
 
 }

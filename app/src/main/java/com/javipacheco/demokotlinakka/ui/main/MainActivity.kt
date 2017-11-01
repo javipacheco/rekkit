@@ -15,7 +15,8 @@ import com.javipacheco.demokotlinakka.models.Commands.*
 import com.javipacheco.demokotlinakka.services.ApiService
 import com.javipacheco.demokotlinakka.services.MainUiService
 import com.javipacheco.demokotlinakka.ui.main.NavigationItems.*
-import katkka.*
+import akme.*
+import com.javipacheco.demokotlinakka.actors.MainErrorActor
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -25,8 +26,9 @@ class MainActivity :
         NavigationView.OnNavigationItemSelectedListener,
         MainUiService {
 
-    val system = ActorSystem.create("KotlinSystem")
-    val mainActorRef = system.actorOf(MainActor.props(ApiService(), this), "mainActor")
+    val system = ActorSystem.create("AkmeSystem")
+    val mainErrorActorRef = system.actorOf(MainErrorActor.props(this), "main-error-actor")
+    val mainActorRef = system.actorOf(MainActor.props(mainErrorActorRef, ApiService(), this), "main-actor")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
