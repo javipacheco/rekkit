@@ -1,4 +1,4 @@
-package com.javipacheco.demokotlinakka.actors
+package com.javipacheco.demokotlinakka.actors.main
 
 import akka.actor.AbstractActor
 import akka.actor.Props
@@ -12,7 +12,7 @@ class MainErrorActor(val uiService: MainUiService): AbstractActor() {
     override fun createReceive(): Receive = receiveBuilder()
             .match(Commands.InitFailureCommand::class.java, { _ ->
                 ServiceMonad().binding {
-                    val s = uiService.showMessage("Error cargando la actividad").bind()
+                    uiService.showMessage("Error cargando la actividad").bind()
                     yields(Unit)
                 }
             })

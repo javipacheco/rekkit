@@ -10,36 +10,43 @@ import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import com.javipacheco.demokotlinakka.R
-import com.javipacheco.demokotlinakka.actors.MainActor
+import com.javipacheco.demokotlinakka.actors.main.MainActor
 import com.javipacheco.demokotlinakka.models.Commands.*
 import com.javipacheco.demokotlinakka.services.ApiService
 import com.javipacheco.demokotlinakka.services.MainUiService
 import com.javipacheco.demokotlinakka.ui.main.NavigationItems.*
 import akme.*
+import android.app.Activity
 import android.support.v7.widget.LinearLayoutManager
-import com.javipacheco.demokotlinakka.actors.MainErrorActor
+import com.javipacheco.demokotlinakka.actors.main.MainErrorActor
 import com.javipacheco.demokotlinakka.models.Events
 import com.javipacheco.demokotlinakka.ui.main.adapters.NewsAdapter
 import kategory.ListKW
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import com.javipacheco.demokotlinakka.actors.commons.NavigationActor
+
 
 class MainActivity :
         AppCompatActivity(),
         NavigationView.OnNavigationItemSelectedListener,
-        MainUiService {
+        MainUiService,
+        NavigationService {
 
     val system = ActorSystem.create("AkmeSystem")
     val mainErrorActorRef = system.actorOf(MainErrorActor.props(this), "main-error-actor")
+    val navigationActorRef = system.actorOf(NavigationActor.props(this), "navigation-actor")
     val mainActorRef = system.actorOf(MainActor.props(mainErrorActorRef, ApiService(), this), "main-actor")
+
+    override fun getActivity(): Activity = this
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         mainActorRef.tell(InitCommand, system.deadLetters())
-        mainActorRef.tell(FillMessageCommand, system.deadLetters())
+        mainActorRef.tell(GetNewsCommand(30), system.deadLetters())
 
         val layoutManager = LinearLayoutManager(this)
         recycler.setLayoutManager(layoutManager)
@@ -90,7 +97,9 @@ class MainActivity :
 
     override fun writeMessage(items: ListKW<Events.RedditNewsDataEvent>): Service<Unit> =
             runOnUiThread {
-                recycler.adapter = NewsAdapter(items)
+                recycler.adapter = NewsAdapter(items) { url ->
+                    navigationActorRef.tell(GoToUrl(url), system.deadLetters())
+                }
             }.catchUi()
 
     override fun showMessage(msg: String): Service<Unit> =

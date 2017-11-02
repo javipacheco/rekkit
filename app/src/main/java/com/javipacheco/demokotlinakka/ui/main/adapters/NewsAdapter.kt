@@ -10,9 +10,9 @@ import com.javipacheco.demokotlinakka.models.Events
 import kategory.ListKW
 import kotlinx.android.synthetic.main.news_row.view.*
 
-class NewsAdapter(val items: ListKW<Events.RedditNewsDataEvent>): RecyclerView.Adapter<NewsAdapter.ViewHolder>() {
+class NewsAdapter(val items: ListKW<Events.RedditNewsDataEvent>, val onClick: (String) -> Unit): RecyclerView.Adapter<NewsAdapter.ViewHolder>() {
 
-    class ViewHolder(val view: View): RecyclerView.ViewHolder(view) {
+    inner class ViewHolder(val view: View): RecyclerView.ViewHolder(view) {
 
         fun populate(item: Events.RedditNewsDataEvent) {
             itemView.news_title.setText(item.title)
@@ -22,6 +22,9 @@ class NewsAdapter(val items: ListKW<Events.RedditNewsDataEvent>): RecyclerView.A
                     .load(item.thumbnail)
                     .centerCrop()
                     .into(itemView.news_photo);
+            itemView.cv.setOnClickListener { v ->
+                onClick(item.url)
+            }
         }
 
     }

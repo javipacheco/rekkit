@@ -1,4 +1,4 @@
-package com.javipacheco.demokotlinakka.actors
+package com.javipacheco.demokotlinakka.actors.main
 
 import akka.actor.AbstractActor
 import akka.actor.ActorRef
@@ -6,8 +6,7 @@ import akka.actor.Props
 import com.javipacheco.demokotlinakka.models.Commands.*
 import com.javipacheco.demokotlinakka.services.ApiService
 import com.javipacheco.demokotlinakka.services.MainUiService
-import kategory.binding
-import kategory.ev
+import kategory.*
 import akme.AkmeException
 import akme.ServiceMonad
 
@@ -25,9 +24,9 @@ class MainActor(val errorActor: ActorRef, val apiService: ApiService, val uiServ
                 }
             }, {})
         })
-        .match(FillMessageCommand::class.java, { _ ->
+        .match(GetNewsCommand::class.java, { info ->
             ServiceMonad().binding {
-                val news = apiService.getNews("", "10").bind()
+                val news = apiService.getNews(info.limit).bind()
                 uiService.writeMessage(news).bind()
                 yields(Unit)
             }
