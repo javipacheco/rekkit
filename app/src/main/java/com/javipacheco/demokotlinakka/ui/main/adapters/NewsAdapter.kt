@@ -17,6 +17,7 @@ class NewsAdapter(val items: ListKW<Events.RedditNewsDataEvent>, val onClick: (S
         fun populate(item: Events.RedditNewsDataEvent) {
             itemView.news_title.setText(item.title)
             itemView.news_author.setText(item.author)
+            itemView.news_comments.setText("${item.num_comments} comments")
             Glide
                     .with(itemView.context)
                     .load(item.thumbnail)
