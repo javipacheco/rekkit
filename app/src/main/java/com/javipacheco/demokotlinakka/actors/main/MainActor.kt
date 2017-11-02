@@ -26,8 +26,9 @@ class MainActor(val errorActor: ActorRef, val apiService: ApiService, val uiServ
         })
         .match(GetNewsCommand::class.java, { info ->
             ServiceMonad().binding {
+                uiService.showLoading()
                 val news = apiService.getNews(info.limit).bind()
-                uiService.writeMessage(news).bind()
+                uiService.showNews(news).bind()
                 yields(Unit)
             }
         })

@@ -1,4 +1,4 @@
-package com.javipacheco.demokotlinakka.ui.main
+package com.javipacheco.demokotlinakka.ui.commons
 
 import akme.*
 import android.app.Activity

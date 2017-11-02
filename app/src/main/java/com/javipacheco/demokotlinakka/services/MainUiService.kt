@@ -9,7 +9,9 @@ interface MainUiService {
 
     fun init(): Service<Unit>
 
-    fun writeMessage(items: ListKW<Events.RedditNewsDataEvent>): Service<Unit>
+    fun showLoading(): Service<Unit>
+
+    fun showNews(items: ListKW<Events.RedditNewsDataEvent>): Service<Unit>
 
     fun showMessage(msg: String): Service<Unit>
 

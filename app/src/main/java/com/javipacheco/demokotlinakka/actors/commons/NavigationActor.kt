@@ -6,7 +6,7 @@ import akme.*
 import kategory.*
 import com.javipacheco.demokotlinakka.models.Commands
 import com.javipacheco.demokotlinakka.services.MainUiService
-import com.javipacheco.demokotlinakka.ui.main.NavigationService
+import com.javipacheco.demokotlinakka.ui.commons.NavigationService
 
 class NavigationActor(val navigationService: NavigationService): AbstractActor() {
 

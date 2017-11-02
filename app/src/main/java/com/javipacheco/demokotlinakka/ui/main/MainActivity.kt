@@ -18,6 +18,7 @@ import com.javipacheco.demokotlinakka.ui.main.NavigationItems.*
 import akme.*
 import android.app.Activity
 import android.support.v7.widget.LinearLayoutManager
+import android.view.View
 import com.javipacheco.demokotlinakka.actors.main.MainErrorActor
 import com.javipacheco.demokotlinakka.models.Events
 import com.javipacheco.demokotlinakka.ui.main.adapters.NewsAdapter
@@ -26,6 +27,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import com.javipacheco.demokotlinakka.actors.commons.NavigationActor
+import com.javipacheco.demokotlinakka.ui.commons.NavigationService
 
 
 class MainActivity :
@@ -95,8 +97,16 @@ class MainActivity :
         nav_view.setNavigationItemSelectedListener(this)
     }
 
-    override fun writeMessage(items: ListKW<Events.RedditNewsDataEvent>): Service<Unit> =
+    override fun showLoading(): Service<Unit> =
             runOnUiThread {
+                progress_bar.visibility = View.VISIBLE
+                recycler.visibility = View.GONE
+            }.catchUi()
+
+    override fun showNews(items: ListKW<Events.RedditNewsDataEvent>): Service<Unit> =
+            runOnUiThread {
+                progress_bar.visibility = View.GONE
+                recycler.visibility = View.VISIBLE
                 recycler.adapter = NewsAdapter(items) { url ->
                     navigationActorRef.tell(GoToUrl(url), system.deadLetters())
                 }
