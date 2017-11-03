@@ -8,6 +8,7 @@ import com.bumptech.glide.Glide
 import com.javipacheco.demokotlinakka.R
 import com.javipacheco.demokotlinakka.models.Events
 import kategory.ListKW
+import kategory.getOrElse
 import kotlinx.android.synthetic.main.news_row.view.*
 
 class NewsAdapter(val items: ListKW<Events.RedditNewsDataEvent>, val onClick: (String) -> Unit): RecyclerView.Adapter<NewsAdapter.ViewHolder>() {
@@ -15,14 +16,20 @@ class NewsAdapter(val items: ListKW<Events.RedditNewsDataEvent>, val onClick: (S
     inner class ViewHolder(val view: View): RecyclerView.ViewHolder(view) {
 
         fun populate(item: Events.RedditNewsDataEvent) {
-            itemView.news_title.setText(item.title)
-            itemView.news_author.setText(item.author)
-            itemView.news_comments.setText("${item.num_comments} comments")
-            Glide
-                    .with(itemView.context)
-                    .load(item.thumbnail)
-                    .centerCrop()
-                    .into(itemView.news_photo);
+            itemView.news_title.text = item.title
+            itemView.news_author.text = item.author
+            itemView.news_comments.text = item.num_comments.toString()
+            item.imageUrl.map { url ->
+                Glide
+                        .with(itemView.context)
+                        .load(url)
+                        .error(R.drawable.ic_error_image)
+                        .centerCrop()
+                        .into(itemView.news_photo)
+            }.getOrElse {
+                itemView.news_photo.setImageResource(R.drawable.ic_missing_image)
+            }
+
             itemView.cv.setOnClickListener { v ->
                 onClick(item.url)
             }

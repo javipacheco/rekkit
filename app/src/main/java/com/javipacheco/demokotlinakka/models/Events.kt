@@ -1,5 +1,7 @@
 package com.javipacheco.demokotlinakka.models
 
+import kategory.*
+
 sealed class Events {
 
     data class RedditNewsDataEvent(
@@ -7,7 +9,8 @@ sealed class Events {
             val title: String,
             val num_comments: Int,
             val created: Long,
-            val thumbnail: String,
+            val thumbnailUrl: String,
+            val imageUrl: Option<String>,
             val url: String
     ) : Events()
 
