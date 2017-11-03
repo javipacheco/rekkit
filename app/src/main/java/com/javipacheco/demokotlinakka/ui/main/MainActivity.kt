@@ -63,18 +63,6 @@ class MainActivity :
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_settings -> return true
-            else -> return super.onOptionsItemSelected(item)
-        }
-    }
-
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         mainActorRef.tell(NavigationCommand(Companion.toNavigationItem(item.itemId)), system.deadLetters())
         return true
@@ -84,11 +72,6 @@ class MainActivity :
 
     override fun init(): Service<Unit> = catchUi {
         setSupportActionBar(toolbar)
-
-        fab.setOnClickListener { view ->
-            mainActorRef.tell(ShowMessageCommand("Replace with your own action"), system.deadLetters())
-        }
-
         val toggle = ActionBarDrawerToggle(
                 this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
@@ -116,12 +99,8 @@ class MainActivity :
             Snackbar.make(drawer_layout, msg, Snackbar.LENGTH_LONG).show().catchUi()
 
     override fun navigation(item: NavigationItems): Service<Unit> = when (item) {
-        Camera -> showMessage("Camera")
-        Gallery -> showMessage("Gallery")
-        SlideShow -> showMessage("SlideShow")
-        Manage -> showMessage("Manage")
-        Share -> showMessage("Share")
-        Send -> showMessage("Send")
+        News -> showMessage("News")
+        GitHub -> showMessage("GitHub")
         NotFound -> showMessage("Oh!! Noo!!")
     }
 

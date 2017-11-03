@@ -1,8 +1,14 @@
 <resources>
-    <string name="app_name">Demo Kotlin Akka</string>
+    <string name="app_name">Rekkit</string>
+    <string name="header_title">Rekkit</string>
+    <string name="header_subtitle">Kotlin + Akka + Kategory</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="news">News</string>
+    <string name="communicate">Communicate</string>
+    <string name="github">GitHub</string>
 
     <string name="action_settings">Settings</string>
 </resources>
