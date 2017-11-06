@@ -10,6 +10,8 @@ sealed class AkmeException {
 
     data class ApiException(val msg: String) : AkmeException()
 
+    data class CallException(val msg: String) : AkmeException()
+
 }
 
 fun <A> ServiceRight(op: () -> A): Either<AkmeException, A> = Either.Right(op())

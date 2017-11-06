@@ -9,8 +9,11 @@ import com.javipacheco.demokotlinakka.services.MainUiService
 import kategory.*
 import akme.AkmeException
 import akme.ServiceMonad
+import com.javipacheco.demokotlinakka.models.States
 
 class MainActor(val errorActor: ActorRef, val apiService: ApiService, val uiService: MainUiService): AbstractActor() {
+
+    private var newsState: States.NewsState = States.NewsState(ListKW.empty())
 
     override fun createReceive(): Receive = receiveBuilder()
         .match(InitCommand::class.java, { _ ->
@@ -27,7 +30,9 @@ class MainActor(val errorActor: ActorRef, val apiService: ApiService, val uiServ
         .match(GetNewsCommand::class.java, { info ->
             ServiceMonad().binding {
                 uiService.showLoading()
-                val news = apiService.getNews(info.limit).bind()
+                val after: Option<String> = Option.fromNullable(newsState.items.getOrNull(0)).map { it.name }
+                val news = apiService.getNews(info.limit, after).bind()
+                newsState = newsState.copy(items = news.combineK(newsState.items))
                 uiService.showNews(news).bind()
                 yields(Unit)
             }

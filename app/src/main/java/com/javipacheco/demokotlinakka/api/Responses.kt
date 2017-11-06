@@ -1,6 +1,6 @@
 package com.javipacheco.demokotlinakka.api
 
-import com.javipacheco.demokotlinakka.models.Events
+import com.javipacheco.demokotlinakka.models.States
 import kategory.Option
 
 sealed class Responses {
@@ -16,6 +16,8 @@ sealed class Responses {
     data class RedditChildrenResponse(val data: RedditNewsDataResponse) : Responses()
 
     data class RedditNewsDataResponse(
+            val id: String,
+            val name: String,
             val author: String,
             val title: String,
             val num_comments: Int,
@@ -25,9 +27,9 @@ sealed class Responses {
             val preview: RedditNewsPreviewResponse?
     ) : Responses() {
 
-        fun toEvent(): Events.RedditNewsDataEvent =
-                Events.RedditNewsDataEvent(
-                        author, title, num_comments, created, thumbnail, Option.fromNullable(preview?.images?.firstOrNull()?.source?.url), url
+        fun toNewsItemState(): States.NewsItemState =
+                States.NewsItemState(
+                        id, name, author, title, num_comments, created, thumbnail, Option.fromNullable(preview?.images?.firstOrNull()?.source?.url), url
                 )
 
     }

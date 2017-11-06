@@ -3,7 +3,7 @@ package com.javipacheco.demokotlinakka.services
 import akme.*
 import kategory.*
 import com.javipacheco.demokotlinakka.api.RedditApi
-import com.javipacheco.demokotlinakka.models.Events
+import com.javipacheco.demokotlinakka.models.States
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
@@ -20,9 +20,9 @@ class ApiService {
         redditApi = retrofit.create(RedditApi::class.java)
     }
 
-    fun getNews(limit: Int, after: Option<Int> = Option.None): Service<ListKW<Events.RedditNewsDataEvent>> =
+    fun getNews(limit: Int, after: Option<String> = Option.None): Service<ListKW<States.NewsItemState>> =
             redditApi.getTop(
-                    after.map { it.toString() }.getOrElse { "" },
-                    limit.toString()).toService().map { ListKW(it.data.children).map { it.data.toEvent() } }
+                    after.getOrElse { "" },
+                    limit.toString()).toService().map { ListKW(it.data.children).map { it.data.toNewsItemState() } }
 
 }

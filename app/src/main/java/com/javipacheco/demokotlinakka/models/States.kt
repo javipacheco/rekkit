@@ -2,9 +2,13 @@ package com.javipacheco.demokotlinakka.models
 
 import kategory.*
 
-sealed class Events {
+sealed class States {
 
-    data class RedditNewsDataEvent(
+    data class NewsState(val items: ListKW<NewsItemState>) : States()
+
+    data class NewsItemState(
+            val id: String,
+            val name: String,
             val author: String,
             val title: String,
             val num_comments: Int,
@@ -12,6 +16,6 @@ sealed class Events {
             val thumbnailUrl: String,
             val imageUrl: Option<String>,
             val url: String
-    ) : Events()
+    ) : States()
 
 }

@@ -6,16 +6,17 @@ import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import com.javipacheco.demokotlinakka.R
-import com.javipacheco.demokotlinakka.models.Events
+import com.javipacheco.demokotlinakka.models.States
 import kategory.ListKW
+import kategory.combineK
 import kategory.getOrElse
 import kotlinx.android.synthetic.main.news_row.view.*
 
-class NewsAdapter(val items: ListKW<Events.RedditNewsDataEvent>, val onClick: (String) -> Unit): RecyclerView.Adapter<NewsAdapter.ViewHolder>() {
+class NewsAdapter(var items: ListKW<States.NewsItemState>, val onClick: (String) -> Unit): RecyclerView.Adapter<NewsAdapter.ViewHolder>() {
 
     inner class ViewHolder(val view: View): RecyclerView.ViewHolder(view) {
 
-        fun populate(item: Events.RedditNewsDataEvent) {
+        fun populate(item: States.NewsItemState) {
             itemView.news_title.text = item.title
             itemView.news_author.text = item.author
             itemView.news_comments.text = item.num_comments.toString()
@@ -49,5 +50,10 @@ class NewsAdapter(val items: ListKW<Events.RedditNewsDataEvent>, val onClick: (S
     }
 
     override fun getItemCount(): Int = items.size
+
+    fun addAfterItems(newItems: ListKW<States.NewsItemState>) {
+        items = newItems.combineK(items)
+        notifyItemRangeInserted(0, newItems.size)
+    }
 
 }

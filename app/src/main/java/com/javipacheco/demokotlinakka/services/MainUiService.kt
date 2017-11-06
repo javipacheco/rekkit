@@ -2,7 +2,7 @@ package com.javipacheco.demokotlinakka.services
 
 import com.javipacheco.demokotlinakka.ui.main.NavigationItems
 import akme.*
-import com.javipacheco.demokotlinakka.models.Events
+import com.javipacheco.demokotlinakka.models.States
 import kategory.ListKW
 
 interface MainUiService {
@@ -11,7 +11,7 @@ interface MainUiService {
 
     fun showLoading(): Service<Unit>
 
-    fun showNews(items: ListKW<Events.RedditNewsDataEvent>): Service<Unit>
+    fun showNews(items: ListKW<States.NewsItemState>): Service<Unit>
 
     fun showMessage(msg: String): Service<Unit>
 
