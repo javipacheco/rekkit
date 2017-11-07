@@ -80,7 +80,7 @@ class MainActivity :
         News ->
             navigationActorRef.tell(LoadNews, system.deadLetters()).catchUi()
         GitHub ->
-            navigationActorRef.tell(GoToUrl("http://www.github.com"), system.deadLetters()).catchUi()
+            navigationActorRef.tell(GoToUrl(getString(R.string.github_url)), system.deadLetters()).catchUi()
         NotFound ->
             showMessage(ItemNotFoundMessage)
     }
