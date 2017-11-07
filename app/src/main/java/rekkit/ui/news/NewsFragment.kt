@@ -21,7 +21,6 @@ import rekkit.ui.commons.NavigationService
 import rekkit.ui.news.NewsMessageItems.*
 import rekkit.ui.news.adapters.NewsAdapter
 import kategory.ListKW
-import kategory.Option
 import kategory.getOrElse
 import kotlinx.android.synthetic.main.news_fragment.*
 
@@ -58,7 +57,7 @@ class NewsFragment:
 
     override fun showLoading(): Service<Unit> =
             activity.runOnUiThread {
-                Option.fromNullable(recycler.adapter).map { _ ->
+                recycler.adapter.toOption().map { _ ->
                     Unit
                 }.getOrElse {
                     progress_bar.visibility = View.VISIBLE
@@ -76,7 +75,7 @@ class NewsFragment:
                 if (items.isEmpty()) {
                     newsActorRef.tell(ShowMessageCommand(NoNewsMessage), system.deadLetters())
                 } else {
-                    Option.fromNullable(recycler.adapter).map { adapter ->
+                    recycler.adapter.toOption().map { adapter ->
                         (adapter as NewsAdapter).addAfterItems(items)
                     }.getOrElse {
                         recycler.adapter = NewsAdapter(items) { url ->

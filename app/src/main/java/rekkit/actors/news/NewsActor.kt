@@ -20,7 +20,7 @@ class NewsActor(val errorActor: ActorRef, val apiService: ApiService, val uiServ
         .match(GetNewsCommand::class.java, { info ->
             ServiceMonad().binding {
                 uiService.showLoading()
-                val before: Option<String> = Option.fromNullable(newsState.items.getOrNull(0)).map { it.name }
+                val before: Option<String> = newsState.items.headOption().map { it.name }
                 val news = apiService.getNews(info.limit, before).bind()
                 newsState = newsState.copy(items = news.combineK(newsState.items))
                 uiService.showNews(news).bind()

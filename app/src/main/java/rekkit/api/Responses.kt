@@ -1,5 +1,6 @@
 package rekkit.api
 
+import akme.toOption
 import rekkit.models.States
 import kategory.Option
 
@@ -29,7 +30,15 @@ sealed class Responses {
 
         fun toNewsItemState(): States.NewsItemState =
                 States.NewsItemState(
-                        id, name, author, title, num_comments, created, thumbnail, Option.fromNullable(preview?.images?.firstOrNull()?.source?.url), url
+                        id,
+                        name,
+                        author,
+                        title,
+                        num_comments,
+                        created,
+                        thumbnail,
+                        preview?.images?.firstOrNull()?.source?.url.toOption(),
+                        url
                 )
 
     }
