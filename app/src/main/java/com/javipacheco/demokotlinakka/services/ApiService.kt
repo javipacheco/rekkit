@@ -20,9 +20,9 @@ class ApiService {
         redditApi = retrofit.create(RedditApi::class.java)
     }
 
-    fun getNews(limit: Int, after: Option<String> = Option.None): Service<ListKW<States.NewsItemState>> =
+    fun getNews(limit: Int, before: Option<String> = Option.None): Service<ListKW<States.NewsItemState>> =
             redditApi.getTop(
-                    after.getOrElse { "" },
+                    before.getOrElse { "" },
                     limit.toString()).toService().map { ListKW(it.data.children).map { it.data.toNewsItemState() } }
 
 }

@@ -25,8 +25,8 @@
 
         </android.support.design.widget.AppBarLayout>
 
-        <include
-            layout="@layout/content_main"
+        <FrameLayout
+            android:id="@+id/main_activity_fragment_container"
             android:layout_width="match_parent"
             android:layout_height="0px"
             android:layout_weight="1" />

@@ -11,5 +11,11 @@
     <string name="communicate">Communicate</string>
     <string name="github">GitHub</string>
 
+    <string name="noMoreNews">There aren\'t new messages</string>
+    <string name="loadingNewsError">Error loading news</string>
+
+    <string name="navigationError">Navigation error</string>
+    <string name="itemNotFoundError">Item not found</string>
+
     <string name="action_settings">Settings</string>
 </resources>

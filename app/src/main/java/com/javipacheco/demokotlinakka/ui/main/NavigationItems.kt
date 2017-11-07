@@ -2,17 +2,17 @@ package com.javipacheco.demokotlinakka.ui.main
 
 import com.javipacheco.demokotlinakka.R
 
-sealed class NavigationItems {
+sealed class NavigationItems(val id: Int) {
 
-    object News : NavigationItems()
-    object GitHub : NavigationItems()
-    object NotFound : NavigationItems()
+    object News : NavigationItems(R.id.nav_news)
+    object GitHub : NavigationItems(R.id.nav_github)
+    object NotFound : NavigationItems(0)
 
     companion object {
 
         fun toNavigationItem(itemId: Int): NavigationItems = when (itemId) {
-            R.id.nav_news -> News
-            R.id.nav_github -> GitHub
+            News.id -> News
+            GitHub.id -> GitHub
             else -> NotFound
         }
 

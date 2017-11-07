@@ -2,19 +2,15 @@ package com.javipacheco.demokotlinakka.actors.main
 
 import akka.actor.AbstractActor
 import akka.actor.Props
-import akme.ServiceMonad
-import com.javipacheco.demokotlinakka.models.Commands
+import com.javipacheco.demokotlinakka.models.Notifications.NavigationFailedNotification
 import com.javipacheco.demokotlinakka.services.MainUiService
-import kategory.binding
+import com.javipacheco.demokotlinakka.ui.main.MainMessageItems
 
 class MainErrorActor(val uiService: MainUiService): AbstractActor() {
 
     override fun createReceive(): Receive = receiveBuilder()
-            .match(Commands.InitFailureCommand::class.java, { _ ->
-                ServiceMonad().binding {
-                    uiService.showMessage("Error cargando la actividad").bind()
-                    yields(Unit)
-                }
+            .match(NavigationFailedNotification::class.java, { _ ->
+                uiService.showMessage(MainMessageItems.NavigationErrorMessage)
             })
             .build()
 

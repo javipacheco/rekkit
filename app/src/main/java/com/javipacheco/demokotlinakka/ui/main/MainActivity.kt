@@ -1,6 +1,8 @@
 package com.javipacheco.demokotlinakka.ui.main
 
 import akka.actor.ActorSystem
+import akme.*
+import android.app.Activity
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
@@ -9,41 +11,28 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import com.javipacheco.demokotlinakka.R
+import com.javipacheco.demokotlinakka.actors.commons.NavigationActor
 import com.javipacheco.demokotlinakka.actors.main.MainActor
+import com.javipacheco.demokotlinakka.actors.main.MainErrorActor
 import com.javipacheco.demokotlinakka.models.Commands.*
 import com.javipacheco.demokotlinakka.services.ApiService
 import com.javipacheco.demokotlinakka.services.MainUiService
+import com.javipacheco.demokotlinakka.ui.commons.NavigationService
+import com.javipacheco.demokotlinakka.ui.main.MainMessageItems.*
 import com.javipacheco.demokotlinakka.ui.main.NavigationItems.*
-import akme.*
-import android.app.Activity
-import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.widget.LinearLayoutManager
-import android.view.View
-import com.javipacheco.demokotlinakka.actors.main.MainErrorActor
-import com.javipacheco.demokotlinakka.models.States
-import com.javipacheco.demokotlinakka.ui.main.adapters.NewsAdapter
-import kategory.ListKW
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
-import kotlinx.android.synthetic.main.content_main.*
-import com.javipacheco.demokotlinakka.actors.commons.NavigationActor
-import com.javipacheco.demokotlinakka.ui.commons.NavigationService
-import kategory.Option
-import kategory.getOrElse
 
 class MainActivity :
         AppCompatActivity(),
         NavigationView.OnNavigationItemSelectedListener,
         MainUiService,
-        NavigationService,
-        SwipeRefreshLayout.OnRefreshListener{
+        NavigationService {
 
     val system = ActorSystem.create("AkmeSystem")
     val mainErrorActorRef = system.actorOf(MainErrorActor.props(this), "main-error-actor")
     val navigationActorRef = system.actorOf(NavigationActor.props(this), "navigation-actor")
     val mainActorRef = system.actorOf(MainActor.props(mainErrorActorRef, ApiService(), this), "main-actor")
-
-    val limit = 30
 
     override fun getActivity(): Activity = this
 
@@ -51,13 +40,16 @@ class MainActivity :
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        mainActorRef.tell(InitCommand, system.deadLetters())
-        mainActorRef.tell(GetNewsCommand(limit), system.deadLetters())
+        setSupportActionBar(toolbar)
+        val toggle = ActionBarDrawerToggle(
+                this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+        drawer_layout.addDrawerListener(toggle)
+        toggle.syncState()
 
-        val layoutManager = LinearLayoutManager(this)
-        recycler.setLayoutManager(layoutManager)
+        nav_view.setNavigationItemSelectedListener(this)
 
-        swipe_refresh.setOnRefreshListener(this)
+        nav_view.setCheckedItem(News.id)
+        nav_view.getMenu().performIdentifierAction(News.id, 0);
 
     }
 
@@ -74,60 +66,23 @@ class MainActivity :
         return true
     }
 
-    override fun onRefresh() {
-        mainActorRef.tell(GetNewsCommand(limit), system.deadLetters())
-    }
-
     // MainUiService
 
-    override fun init(): Service<Unit> = catchUi {
-        setSupportActionBar(toolbar)
-        val toggle = ActionBarDrawerToggle(
-                this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
-        drawer_layout.addDrawerListener(toggle)
-        toggle.syncState()
-
-        nav_view.setNavigationItemSelectedListener(this)
+    override fun showMessage(item: MainMessageItems): Service<Unit> = catchUi {
+        val msg = when(item) {
+            is NavigationErrorMessage -> getString(R.string.navigationError)
+            is ItemNotFoundMessage -> getString(R.string.itemNotFoundError)
+        }
+        Snackbar.make(drawer_layout, msg, Snackbar.LENGTH_LONG).show()
     }
-
-    override fun showLoading(): Service<Unit> =
-            runOnUiThread {
-                Option.fromNullable(recycler.adapter).map { _ ->
-                    Unit
-                }.getOrElse {
-                    progress_bar.visibility = View.VISIBLE
-                    recycler.visibility = View.GONE
-                    Unit
-                }
-
-            }.catchUi()
-
-    override fun showNews(items: ListKW<States.NewsItemState>): Service<Unit> =
-            runOnUiThread {
-                progress_bar.visibility = View.GONE
-                recycler.visibility = View.VISIBLE
-
-                Option.fromNullable(recycler.adapter).map { adapter ->
-                    (adapter as NewsAdapter).addAfterItems(items)
-                }.getOrElse {
-                    recycler.adapter = NewsAdapter(items) { url ->
-                        navigationActorRef.tell(GoToUrl(url), system.deadLetters())
-                    }
-                    Unit
-                }
-                swipe_refresh.setRefreshing(false)
-            }.catchUi()
-
-    override fun showMessage(msg: String): Service<Unit> =
-            Snackbar.make(drawer_layout, msg, Snackbar.LENGTH_LONG).show().catchUi()
 
     override fun navigation(item: NavigationItems): Service<Unit> = when (item) {
         News ->
-            showMessage("News")
+            navigationActorRef.tell(LoadNews, system.deadLetters()).catchUi()
         GitHub ->
-            showMessage("GitHub")
+            navigationActorRef.tell(GoToUrl("http://www.github.com"), system.deadLetters()).catchUi()
         NotFound ->
-            showMessage("Oh!! Noo!!")
+            showMessage(ItemNotFoundMessage)
     }
 
     override fun closeDrawer(): Service<Unit> =

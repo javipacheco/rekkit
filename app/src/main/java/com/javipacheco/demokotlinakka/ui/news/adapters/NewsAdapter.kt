@@ -1,4 +1,4 @@
-package com.javipacheco.demokotlinakka.ui.main.adapters
+package com.javipacheco.demokotlinakka.ui.news.adapters
 
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
