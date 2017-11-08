@@ -1,6 +1,5 @@
 package rekkit.ui.main
 
-import akka.actor.ActorSystem
 import akme.*
 import android.app.Activity
 import android.os.Bundle
@@ -11,17 +10,18 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import rekkit.R
-import rekkit.actors.commons.NavigationActor
-import rekkit.actors.main.MainActor
-import rekkit.actors.main.MainErrorActor
-import rekkit.models.Commands.*
-import rekkit.services.ApiService
+import rekkit.actors.NavigationActors
+import rekkit.models.Commands.NavigationGoToUrlCommand
+import rekkit.models.Commands.NavigationLoadNewsCommand
 import rekkit.services.MainUiService
 import rekkit.ui.commons.NavigationService
-import rekkit.ui.main.MainMessageItems.*
-import rekkit.ui.main.NavigationItems.*
+import rekkit.ui.main.MainMessageItems.ItemNotFoundMessage
+import rekkit.ui.main.MainMessageItems.NavigationErrorMessage
+import rekkit.ui.main.MainNavigationItems.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
+import rekkit.actors.MainActors
+import rekkit.models.Commands
 
 class MainActivity :
         AppCompatActivity(),
@@ -29,10 +29,8 @@ class MainActivity :
         MainUiService,
         NavigationService {
 
-    val system = ActorSystem.create("AkmeSystem")
-    val mainErrorActorRef = system.actorOf(MainErrorActor.props(this), "main-error-actor")
-    val navigationActorRef = system.actorOf(NavigationActor.props(this), "navigation-actor")
-    val mainActorRef = system.actorOf(MainActor.props(mainErrorActorRef, ApiService(), this), "main-actor")
+    val navigationActorRef = NavigationActors(this)
+    val mainActorRef = MainActors(this)
 
     override fun getActivity(): Activity = this
 
@@ -55,37 +53,46 @@ class MainActivity :
 
     override fun onBackPressed() {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
-            mainActorRef.tell(CloseDrawerCommand, system.deadLetters())
+            mainActorRef.mainActor.sendBlocking(Commands.MainCloseDrawerCommand)
         } else {
             super.onBackPressed()
         }
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        mainActorRef.tell(NavigationCommand(Companion.toNavigationItem(item.itemId)), system.deadLetters())
+        mainActorRef.mainActor.sendBlocking(Commands.MainNavigationCommand(Companion.toNavigationItem(item.itemId)))
         return true
     }
 
     // MainUiService
 
-    override fun showMessage(item: MainMessageItems): Service<Unit> = catchUi {
+    override fun showMessage(item: MainMessageItems): Service<Unit> = runOnUiThread {
         val msg = when(item) {
             is NavigationErrorMessage -> getString(R.string.navigationError)
             is ItemNotFoundMessage -> getString(R.string.itemNotFoundError)
         }
         Snackbar.make(drawer_layout, msg, Snackbar.LENGTH_LONG).show()
-    }
+    }.catchUi()
 
-    override fun navigation(item: NavigationItems): Service<Unit> = when (item) {
-        News ->
-            navigationActorRef.tell(LoadNews, system.deadLetters()).catchUi()
-        GitHub ->
-            navigationActorRef.tell(GoToUrl(getString(R.string.github_url)), system.deadLetters()).catchUi()
-        NotFound ->
-            showMessage(ItemNotFoundMessage)
-    }
+    override fun navigation(item: MainNavigationItems): Service<Unit> = runOnUiThread {
+        when (item) {
+            News ->
+                navigationActorRef
+                        .mainActor
+                        .sendBlocking(NavigationLoadNewsCommand)
+            GitHub ->
+                navigationActorRef
+                        .mainActor
+                        .sendBlocking(NavigationGoToUrlCommand(getString(R.string.github_url)))
+            NotFound ->
+                navigationActorRef
+                        .mainActor
+                        .sendBlocking(Commands.MainShowMessageCommand(ItemNotFoundMessage))
+        }
+    }.catchUi()
 
-    override fun closeDrawer(): Service<Unit> =
+    override fun closeDrawer(): Service<Unit> = runOnUiThread {
             drawer_layout.closeDrawer(GravityCompat.START).catchUi()
+    }.catchUi()
 
 }

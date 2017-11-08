@@ -36,8 +36,7 @@ dependencies {
     })
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
 
-    compile 'com.typesafe.akka:akka-actor_2.11:2.5.3'
-    testCompile 'com.typesafe.akka:akka-testkit_2.11:2.5.3'
+    compile 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.19.3'
 
     compile 'io.kategory:kategory:0.3.10'
 

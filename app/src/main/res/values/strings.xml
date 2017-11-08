@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Rekkit</string>
     <string name="header_title">Rekkit</string>
-    <string name="header_subtitle">Kotlin + Akka + Kategory</string>
+    <string name="header_subtitle">Kotlin + Actors + Kategory</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

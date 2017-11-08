@@ -1,20 +1,22 @@
 package rekkit.models
 
-import rekkit.ui.main.NavigationItems
+import rekkit.ui.main.MainMessageItems
+import rekkit.ui.main.MainNavigationItems
 import rekkit.ui.news.NewsMessageItems
 
 sealed class Commands {
 
     // Main
-    data class NavigationCommand(val item: NavigationItems) : Commands()
-    data class ShowMessageCommand(val item: NewsMessageItems) : Commands()
-    object CloseDrawerCommand : Commands()
+    data class MainNavigationCommand(val item: MainNavigationItems) : Commands()
+    data class MainShowMessageCommand(val item: MainMessageItems) : Commands()
+    object MainCloseDrawerCommand : Commands()
 
     // News
-    data class GetNewsCommand(val limit: Int) : Commands()
+    data class NewsGetItemsCommand(val limit: Int) : Commands()
+    data class NewsShowMessageCommand(val item: NewsMessageItems) : Commands()
 
     // Navigation
-    object LoadNews : Commands()
-    data class GoToUrl(val url: String) : Commands()
+    object NavigationLoadNewsCommand : Commands()
+    data class NavigationGoToUrlCommand(val url: String) : Commands()
 
 }
