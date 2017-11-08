@@ -1,6 +1,6 @@
 # rekkit
 
-Rekkit is a proof of concept for Android using Kotlin + Akka + Kategory
+Rekkit is a proof of concept for Android using Kotlin + Actors + Kategory. Rekkit is an application for reading Reddit news
 
 - [X] First approach
 - [ ] Write README :-)
