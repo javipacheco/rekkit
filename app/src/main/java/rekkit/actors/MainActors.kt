@@ -5,7 +5,7 @@ import kategory.*
 import kotlinx.coroutines.experimental.channels.actor
 import rekkit.models.Commands
 import rekkit.models.Notifications
-import rekkit.services.MainUiService
+import rekkit.ui.main.MainUiService
 import rekkit.ui.main.MainMessageItems
 
 class MainActors(val uiService: MainUiService) {

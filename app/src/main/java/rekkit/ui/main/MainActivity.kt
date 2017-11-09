@@ -13,7 +13,6 @@ import rekkit.R
 import rekkit.actors.NavigationActors
 import rekkit.models.Commands.NavigationGoToUrlCommand
 import rekkit.models.Commands.NavigationLoadNewsCommand
-import rekkit.services.MainUiService
 import rekkit.ui.commons.NavigationService
 import rekkit.ui.main.MainMessageItems.ItemNotFoundMessage
 import rekkit.ui.main.MainMessageItems.NavigationErrorMessage

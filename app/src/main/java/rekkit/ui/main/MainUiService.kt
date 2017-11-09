@@ -1,4 +1,4 @@
-package rekkit.services
+package rekkit.ui.main
 
 import rekkit.ui.main.MainNavigationItems
 import akme.*
