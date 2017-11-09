@@ -1,6 +1,6 @@
-package rekkit.services
+package rekkit.ui.main
 
-import rekkit.ui.main.NavigationItems
+import rekkit.ui.main.MainNavigationItems
 import akme.*
 import rekkit.ui.main.MainMessageItems
 
@@ -8,7 +8,7 @@ interface MainUiService {
 
     fun showMessage(item: MainMessageItems): Service<Unit>
 
-    fun navigation(item: NavigationItems): Service<Unit>
+    fun navigation(item: MainNavigationItems): Service<Unit>
 
     fun closeDrawer(): Service<Unit>
 

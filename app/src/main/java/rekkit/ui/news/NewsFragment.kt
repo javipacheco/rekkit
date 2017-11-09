@@ -1,7 +1,9 @@
 package rekkit.ui.news
 
-import akka.actor.ActorSystem
-import akme.*
+import akme.Service
+import akme.catchUi
+import akme.sendBlocking
+import akme.toOption
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
@@ -10,19 +12,18 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import kategory.ListKW
+import kategory.getOrElse
+import kotlinx.android.synthetic.main.news_fragment.*
 import rekkit.R
-import rekkit.actors.commons.NavigationActor
-import rekkit.actors.news.NewsActor
-import rekkit.actors.news.NewsErrorActor
+import rekkit.actors.NavigationActors
+import rekkit.actors.NewsActors
 import rekkit.models.Commands.*
 import rekkit.models.States
 import rekkit.services.ApiService
 import rekkit.ui.commons.NavigationService
 import rekkit.ui.news.NewsMessageItems.*
 import rekkit.ui.news.adapters.NewsAdapter
-import kategory.ListKW
-import kategory.getOrElse
-import kotlinx.android.synthetic.main.news_fragment.*
 
 class NewsFragment:
         Fragment(),
@@ -30,10 +31,8 @@ class NewsFragment:
         NavigationService,
         SwipeRefreshLayout.OnRefreshListener {
 
-    val system = ActorSystem.create("AkmeSystem")
-    val newsErrorActorRef = system.actorOf(NewsErrorActor.props(this), "news-error-actor")
-    val navigationActorRef = system.actorOf(NavigationActor.props(this), "navigation-actor")
-    val newsActorRef = system.actorOf(NewsActor.props(newsErrorActorRef, ApiService(), this), "news-actor")
+    val navigationActorRef = NavigationActors(this)
+    val newsActorRef = NewsActors(ApiService(), this)
 
     val limit = 10
 
@@ -46,11 +45,11 @@ class NewsFragment:
 
         swipe_refresh.setOnRefreshListener(this)
 
-        newsActorRef.tell(GetNewsCommand(limit), system.deadLetters())
+        newsActorRef.mainActor.sendBlocking(NewsGetItemsCommand(limit))
     }
 
     override fun onRefresh() {
-        newsActorRef.tell(GetNewsCommand(limit), system.deadLetters())
+        newsActorRef.mainActor.sendBlocking(NewsGetItemsCommand(limit))
     }
 
     // News UI Service
@@ -73,13 +72,13 @@ class NewsFragment:
                 recycler.visibility = View.VISIBLE
 
                 if (items.isEmpty()) {
-                    newsActorRef.tell(ShowMessageCommand(NoNewsMessage), system.deadLetters())
+                    newsActorRef.mainActor.sendBlocking(NewsShowMessageCommand(NoNewsMessage))
                 } else {
                     recycler.adapter.toOption().map { adapter ->
                         (adapter as NewsAdapter).addAfterItems(items)
                     }.getOrElse {
                         recycler.adapter = NewsAdapter(items) { url ->
-                            navigationActorRef.tell(GoToUrl(url), system.deadLetters())
+                            navigationActorRef.mainActor.sendBlocking(NavigationGoToUrlCommand(url))
                         }
                         Unit
                     }
@@ -87,13 +86,13 @@ class NewsFragment:
                 swipe_refresh.setRefreshing(false)
             }.catchUi()
 
-    override fun showMessage(item: NewsMessageItems): Service<Unit> = catchUi {
+    override fun showMessage(item: NewsMessageItems): Service<Unit> = activity.runOnUiThread {
         val msg = when(item) {
             is NoNewsMessage -> getString(R.string.noMoreNews)
             is ErrorLoadingNewsMessage -> getString(R.string.loadingNewsError)
             is ErrorLoadingViewsMessage -> getString(R.string.loadingNewsError)
         }
         Snackbar.make(swipe_refresh, msg, Snackbar.LENGTH_LONG).show()
-    }
+    }.catchUi()
 
 }
