@@ -6,7 +6,7 @@ import kotlinx.coroutines.experimental.runBlocking
 
 typealias Service<A> = Either<AkmeException, A>
 
-sealed class AkmeException {
+sealed class AkmeException: Throwable() {
 
     data class UiException(val msg: String) : AkmeException()
 

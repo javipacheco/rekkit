@@ -22,7 +22,7 @@ class NewsActors(val apiService: ApiService, val uiService: NewsUiService) {
             when (msg) {
                 is Commands.NewsGetItemsCommand ->
                     ServiceMonad().binding {
-                        uiService.showLoading()
+                        uiService.showLoading().bind()
                         val before: Option<String> = newsState.items.headOption().map { it.name }
                         val news = apiService.getNews(msg.limit, before).bind()
                         newsState = newsState.copy(items = news.combineK(newsState.items))
