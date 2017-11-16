@@ -12,6 +12,7 @@ import rekkit.models.States
 import rekkit.services.ApiService
 import rekkit.ui.news.NewsMessageItems
 import rekkit.ui.news.NewsUiService
+import kotlinx.coroutines.experimental.android.UI
 
 class NewsActors(val apiService: ApiService, val uiService: NewsUiService) {
 
@@ -22,11 +23,11 @@ class NewsActors(val apiService: ApiService, val uiService: NewsUiService) {
             when (msg) {
                 is Commands.NewsGetItemsCommand ->
                     ServiceMonad().binding {
-                        uiService.showLoading().bind()
+                        bindIn(UI) { uiService.showLoading() }
                         val before: Option<String> = newsState.items.headOption().map { it.name }
                         val news = apiService.getNews(msg.limit, before).bind()
                         newsState = newsState.copy(items = news.combineK(newsState.items))
-                        uiService.showNews(news).bind()
+                        bindIn(UI) {uiService.showNews(news) }
                         yields(Unit)
                     }.ev().fold({ ex ->
                         when(ex) {

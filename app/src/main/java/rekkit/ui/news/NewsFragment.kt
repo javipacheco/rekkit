@@ -54,45 +54,42 @@ class NewsFragment:
 
     // News UI Service
 
-    override fun showLoading(): Service<Unit> =
-            activity.runOnUiThread {
-                recycler.adapter.toOption().map { _ ->
-                    Unit
-                }.getOrElse {
-                    progress_bar.visibility = View.VISIBLE
-                    recycler.visibility = View.GONE
-                    Unit
+    override fun showLoading(): Service<Unit> = catchUi {
+        recycler.adapter.toOption().map { _ ->
+            Unit
+        }.getOrElse {
+            progress_bar.visibility = View.VISIBLE
+            recycler.visibility = View.GONE
+            Unit
+        }
+    }
+
+    override fun showNews(items: ListKW<States.NewsItemState>): Service<Unit> = catchUi {
+        progress_bar.visibility = View.GONE
+        recycler.visibility = View.VISIBLE
+
+        if (items.isEmpty()) {
+            newsActorRef.mainActor.sendBlocking(NewsShowMessageCommand(NoNewsMessage))
+        } else {
+            recycler.adapter.toOption().map { adapter ->
+                (adapter as NewsAdapter).addAfterItems(items)
+            }.getOrElse {
+                recycler.adapter = NewsAdapter(items) { url ->
+                    navigationActorRef.mainActor.sendBlocking(NavigationGoToUrlCommand(url))
                 }
+                Unit
+            }
+        }
+        swipe_refresh.setRefreshing(false)
+    }
 
-            }.catchUi()
-
-    override fun showNews(items: ListKW<States.NewsItemState>): Service<Unit> =
-            activity.runOnUiThread {
-                progress_bar.visibility = View.GONE
-                recycler.visibility = View.VISIBLE
-
-                if (items.isEmpty()) {
-                    newsActorRef.mainActor.sendBlocking(NewsShowMessageCommand(NoNewsMessage))
-                } else {
-                    recycler.adapter.toOption().map { adapter ->
-                        (adapter as NewsAdapter).addAfterItems(items)
-                    }.getOrElse {
-                        recycler.adapter = NewsAdapter(items) { url ->
-                            navigationActorRef.mainActor.sendBlocking(NavigationGoToUrlCommand(url))
-                        }
-                        Unit
-                    }
-                }
-                swipe_refresh.setRefreshing(false)
-            }.catchUi()
-
-    override fun showMessage(item: NewsMessageItems): Service<Unit> = activity.runOnUiThread {
+    override fun showMessage(item: NewsMessageItems): Service<Unit> = catchUi {
         val msg = when(item) {
             is NoNewsMessage -> getString(R.string.noMoreNews)
             is ErrorLoadingNewsMessage -> getString(R.string.loadingNewsError)
             is ErrorLoadingViewsMessage -> getString(R.string.loadingNewsError)
         }
         Snackbar.make(swipe_refresh, msg, Snackbar.LENGTH_LONG).show()
-    }.catchUi()
+    }
 
 }
