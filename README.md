@@ -7,6 +7,8 @@ Rekkit is a proof of concept for Android using Kotlin + Actors + Kategory. Rekki
 - [ ] Tests :-)
 - [ ] Retrieve the internal state when the actor is started. Something like `akka-persistence` 
 
+Blog post https://medium.com/@javipacheco/happy-path-kotlin-actors-kategory-proof-of-concept-322e9099d2ea
+
 # License
 
     Copyright (C) 2017 Javi Pacheco
